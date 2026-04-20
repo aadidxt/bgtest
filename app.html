@@ -3,52 +3,79 @@
 <head>
   <title>Background Remover App</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f2f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
     }
 
     .container {
       background: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      width: 800px;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      height: 100vh;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 20px;
+      margin: 0 0 15px 0;
+      color: #333;
+      font-size: 24px;
+      font-weight: 600;
     }
 
     .topbar {
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
       margin-bottom: 15px;
-      gap: 10px;
+      gap: 15px;
       flex-wrap: wrap;
+      flex-shrink: 0;
     }
 
     .meta-box {
-      flex: 1;
-      min-width: 280px;
-      border: 1px solid #d9e2ec;
-      border-radius: 8px;
-      padding: 10px;
-      background: #f8fafc;
+      flex: 0 1 auto;
+      min-width: 250px;
+      border: 2px solid #f0f0f0;
+      border-radius: 12px;
+      padding: 12px 15px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     }
 
-    .uid-text,
-    .api-text {
-      font-size: 12px;
-      color: #4a5568;
+    .uid-text {
+      font-size: 11px;
+      color: #555;
       word-break: break-all;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .api-text {
+      font-size: 11px;
+      color: #667eea;
+      margin-bottom: 8px;
+      font-weight: 600;
     }
 
     .api-row {
@@ -61,64 +88,184 @@
 
     #apiKeyInput {
       flex: 1;
-      min-width: 240px;
-      padding: 8px;
-      border: 1px solid #cbd5e0;
-      border-radius: 5px;
+      min-width: 150px;
+      padding: 8px 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 12px;
+      transition: all 0.3s ease;
+    }
+
+    #apiKeyInput:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
     .boxes {
       display: flex;
-      gap: 20px;
+      flex: 1;
+      gap: 15px;
+      margin-bottom: 10px;
+      overflow: hidden;
     }
 
     .box {
       flex: 1;
-      border: 2px dashed #aaa;
-      border-radius: 10px;
+      border: 3px dashed #d0d0d0;
+      border-radius: 15px;
       padding: 15px;
       text-align: center;
-      min-height: 300px;
+      background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .box img {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .box:hover {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #f0f2ff 0%, #f5f0ff 100%);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
     }
 
     .box h3 {
-      margin-bottom: 10px;
+      margin: 0 0 10px 0;
+      color: #333;
+      font-size: 14px;
+      font-weight: 600;
     }
 
     img {
-      max-width: 100%;
-      max-height: 250px;
-      margin-top: 10px;
+      width: 100%;
+      height: auto;
+      max-height: 220px;
       display: none;
+      border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+      object-fit: contain;
+      margin: auto 0;
+    }
+
+    input[type="file"] {
+      padding: 6px 8px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.3s ease;
+    }
+
+    input[type="file"]:hover {
+      border-color: #667eea;
+      background-color: #f9f9f9;
     }
 
     button {
-      margin-top: 10px;
-      padding: 10px 20px;
+      margin-top: 8px;
+      padding: 8px 16px;
       border: none;
-      background: #007bff;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
     }
 
     .secondary-btn {
       margin-top: 0;
-      background: #2f3b52;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 8px 14px;
+      font-size: 11px;
     }
 
     #download {
       display: none;
-      margin-top: 10px;
-      color: green;
+      margin-top: 8px;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      color: white;
       text-decoration: none;
-      font-weight: bold;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3);
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    #download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(56, 239, 125, 0.4);
     }
 
     #status {
       text-align: center;
-      margin-top: 15px;
-      font-weight: bold;
+      font-weight: 600;
+      padding: 10px;
+      border-radius: 6px;
+      background: #f0f4ff;
+      color: #667eea;
+      min-height: 16px;
+      font-size: 12px;
+      flex-shrink: 0;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 12px;
+        border-radius: 15px;
+      }
+
+      h2 {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+
+      .meta-box {
+        min-width: 100%;
+        padding: 10px;
+      }
+
+      .topbar {
+        margin-bottom: 10px;
+      }
+
+      .boxes {
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .box {
+        padding: 10px;
+      }
+
+      button {
+        padding: 6px 12px;
+        font-size: 11px;
+      }
     }
   </style>
 </head>
@@ -135,13 +282,12 @@
           <button class="secondary-btn" onclick="saveApiKey()">Save API Key</button>
         </div>
       </div>
-      <button class="secondary-btn" onclick="goToDashboard()">Go to Dashboard</button>
     </div>
 
     <div class="boxes">
       <div class="box">
         <h3>Upload Image</h3>
-        <input type="file" id="fileInput">
+        <input type="file" id="fileInput" onchange="previewImage()">
         <br>
         <button onclick="upload()">Remove Background</button>
         <img id="uploadPreview" alt="Upload preview">
@@ -180,37 +326,6 @@
       document.getElementById("apiKeyInput").value = apiKey;
     }
 
-    async function initializeUser() {
-      const apiKey = getApiKey();
-      if (!apiKey) {
-        throw new Error("Enter API key to start");
-      }
-
-      const existingUid = getUid();
-      if (existingUid) {
-        setUid(existingUid);
-        return existingUid;
-      }
-
-      const response = await fetch("http://127.0.0.1:5000/api/v1/session", {
-        method: "POST",
-        headers: {
-          "x-api-key": apiKey
-        }
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Invalid API Key");
-        }
-        throw new Error("Could not create user session");
-      }
-
-      const data = await response.json();
-      setUid(data.uid);
-      return data.uid;
-    }
-
     async function saveApiKey() {
       const status = document.getElementById("status");
       const input = document.getElementById("apiKeyInput").value.trim();
@@ -220,24 +335,33 @@
       }
 
       setApiKey(input);
-      localStorage.removeItem(UID_KEY);
-      document.getElementById("userIdValue").innerText = "-";
-
-      try {
-        await initializeUser();
-        status.innerText = "API key accepted";
-      } catch (e) {
-        status.innerText = e.message;
-      }
+      status.innerText = "API key saved successfully";
     }
 
-    function goToDashboard() {
-      window.location.href = "dashboard.html";
+    function previewImage() {
+      const fileInput = document.getElementById("fileInput");
+      const preview = document.getElementById("uploadPreview");
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      }
     }
 
     async function upload() {
       const fileInput = document.getElementById("fileInput");
       const status = document.getElementById("status");
+
+      // Check if API key is set before uploading
+      const apiKey = getApiKey();
+      if (!apiKey) {
+        status.innerText = "Please enter and save an API key first";
+        return;
+      }
 
       if (!fileInput.files[0]) {
         alert("Please select a file");
@@ -245,14 +369,6 @@
       }
 
       status.innerText = "Processing...";
-
-      const preview = document.getElementById("uploadPreview");
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        preview.src = e.target.result;
-        preview.style.display = "block";
-      };
-      reader.readAsDataURL(fileInput.files[0]);
 
       const formData = new FormData();
       formData.append("image", fileInput.files[0]);
@@ -299,14 +415,10 @@
     }
 
     (async function init() {
-      try {
-        const savedKey = getApiKey();
-        if (savedKey) {
-          document.getElementById("apiKeyInput").value = savedKey;
-        }
-        await initializeUser();
-      } catch (e) {
-        document.getElementById("status").innerText = e.message;
+      // Load saved API key if it exists
+      const savedKey = getApiKey();
+      if (savedKey) {
+        document.getElementById("apiKeyInput").value = savedKey;
       }
     })();
   </script>

@@ -10,6 +10,7 @@ def create_app():
 
     @app.route('/')
     def home():
+        # Allow app to load without API key, API key will be required when making requests
         return app.send_static_file('app.html')
 
     return app
