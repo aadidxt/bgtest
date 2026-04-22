@@ -352,15 +352,43 @@
       }
     }
 
+    function getApiKeyFromInput() {
+      return document.getElementById("apiKeyInput").value.trim();
+    }
+
     async function upload() {
       const fileInput = document.getElementById("fileInput");
       const status = document.getElementById("status");
 
-      // Check if API key is set before uploading
-      const apiKey = getApiKey();
+      // Check if API key is present in the input field
+      const apiKey = getApiKeyFromInput();
       if (!apiKey) {
-        status.innerText = "Please enter and save an API key first";
+        status.innerText = "Please enter an API key first";
         return;
+      }
+
+      // Validate API key by making a test request
+      status.innerText = "Validating API key...";
+      try {
+        const testFormData = new FormData();
+        testFormData.append("image", new Blob(["test"], {type: "text/plain"}), "test.txt");
+        
+        const testResponse = await fetch("http://127.0.0.1:5000/api/v1/remove-bg", {
+          method: "POST",
+          body: testFormData,
+          headers: {
+            "x-user-id": getUid(),
+            "x-api-key": apiKey
+          }
+        });
+        
+        if (testResponse.status === 401) {
+          status.innerText = "Invalid API key";
+          return;
+        }
+      } catch (error) {
+        // If validation fails due to network error, proceed anyway
+        console.log("API key validation failed, proceeding...");
       }
 
       if (!fileInput.files[0]) {
@@ -378,7 +406,7 @@
         body: formData,
         headers: {
           "x-user-id": getUid(),
-          "x-api-key": getApiKey()
+          "x-api-key": getApiKeyFromInput()
         }
       });
 
@@ -415,11 +443,11 @@
     }
 
     (async function init() {
-      // Load saved API key if it exists
-      const savedKey = getApiKey();
-      if (savedKey) {
-        document.getElementById("apiKeyInput").value = savedKey;
-      }
+      // API key field remains empty - user must enter manually
+      // const savedKey = getApiKey();
+      // if (savedKey) {
+      //   document.getElementById("apiKeyInput").value = savedKey;
+      // }
     })();
   </script>
 </body>

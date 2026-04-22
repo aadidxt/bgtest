@@ -10,3 +10,7 @@ env/
 .gitignore
 .vscode
 README.md
+
+# IMPORTANT
+.env
+.env.*
