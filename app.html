@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Background Remover App</title>
   <style>
     * {
@@ -180,6 +181,8 @@
       font-weight: 600;
       transition: all 0.3s ease;
       box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     button:hover {
@@ -191,13 +194,7 @@
       transform: translateY(0);
     }
 
-    .secondary-btn {
-      margin-top: 0;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 8px 14px;
-      font-size: 11px;
-    }
-
+    
     #download {
       display: none;
       margin-top: 8px;
@@ -233,7 +230,76 @@
       margin: 0;
     }
 
-    @media (max-width: 768px) {
+    /* Mobile devices (320px - 480px) */
+    @media (max-width: 480px) {
+      body {
+        padding: 5px;
+      }
+
+      .container {
+        padding: 10px;
+        border-radius: 10px;
+        height: 100vh;
+        max-width: 100%;
+      }
+
+      h2 {
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+
+      .topbar {
+        margin-bottom: 8px;
+        gap: 8px;
+      }
+
+      .meta-box {
+        min-width: 100%;
+        padding: 8px;
+        border-radius: 8px;
+      }
+
+      .api-row {
+        flex-direction: column;
+        gap: 6px;
+        align-items: stretch;
+      }
+
+      #apiKeyInput {
+        min-width: auto;
+        width: 100%;
+      }
+
+      .boxes {
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .box {
+        padding: 8px;
+        min-height: 200px;
+      }
+
+      img {
+        max-height: 150px;
+      }
+
+      button {
+        padding: 8px 12px;
+        font-size: 11px;
+        width: 100%;
+      }
+
+      
+      input[type="file"] {
+        width: 100%;
+        font-size: 11px;
+      }
+    }
+
+    /* Tablets and small laptops (481px - 768px) */
+    @media (min-width: 481px) and (max-width: 768px) {
       .container {
         padding: 12px;
         border-radius: 15px;
@@ -266,6 +332,67 @@
         padding: 6px 12px;
         font-size: 11px;
       }
+
+      img {
+        max-height: 180px;
+      }
+    }
+
+    /* Large tablets and small desktops (769px - 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .container {
+        padding: 15px;
+        max-width: 95%;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .meta-box {
+        min-width: 280px;
+      }
+
+      img {
+        max-height: 200px;
+      }
+    }
+
+    /* Large desktops (1025px+) */
+    @media (min-width: 1025px) {
+      .container {
+        padding: 20px;
+        max-width: 1200px;
+      }
+
+      img {
+        max-height: 240px;
+      }
+    }
+
+    /* Extra small screens (max-width: 320px) */
+    @media (max-width: 320px) {
+      h2 {
+        font-size: 14px;
+      }
+
+      .uid-text {
+        font-size: 10px;
+      }
+
+      .api-text {
+        font-size: 10px;
+      }
+
+      #apiKeyInput {
+        font-size: 11px;
+        padding: 6px 8px;
+      }
+
+      button {
+        font-size: 10px;
+        padding: 6px 10px;
+      }
     }
   </style>
 </head>
@@ -279,7 +406,6 @@
         <div class="api-text">API Key is required to use app</div>
         <div class="api-row">
           <input id="apiKeyInput" type="text" placeholder="Enter API key">
-          <button class="secondary-btn" onclick="saveApiKey()">Save API Key</button>
         </div>
       </div>
     </div>
@@ -306,36 +432,9 @@
 
   <script>
     const UID_KEY = "bg_remover_uid";
-    const API_KEY_STORAGE = "bg_api_key";
 
     function getUid() {
       return localStorage.getItem(UID_KEY);
-    }
-
-    function getApiKey() {
-      return localStorage.getItem(API_KEY_STORAGE);
-    }
-
-    function setUid(uid) {
-      localStorage.setItem(UID_KEY, uid);
-      document.getElementById("userIdValue").innerText = uid;
-    }
-
-    function setApiKey(apiKey) {
-      localStorage.setItem(API_KEY_STORAGE, apiKey);
-      document.getElementById("apiKeyInput").value = apiKey;
-    }
-
-    async function saveApiKey() {
-      const status = document.getElementById("status");
-      const input = document.getElementById("apiKeyInput").value.trim();
-      if (!input) {
-        status.innerText = "Please enter API key";
-        return;
-      }
-
-      setApiKey(input);
-      status.innerText = "API key saved successfully";
     }
 
     function previewImage() {
@@ -373,7 +472,7 @@
         const testFormData = new FormData();
         testFormData.append("image", new Blob(["test"], {type: "text/plain"}), "test.txt");
         
-        const testResponse = await fetch("http://127.0.0.1:5000/api/v1/remove-bg", {
+        const testResponse = await fetch("/api/v1/remove-bg", {
           method: "POST",
           body: testFormData,
           headers: {
@@ -401,7 +500,7 @@
       const formData = new FormData();
       formData.append("image", fileInput.files[0]);
 
-      const response = await fetch("http://127.0.0.1:5000/api/v1/remove-bg", {
+      const response = await fetch("/api/v1/remove-bg", {
         method: "POST",
         body: formData,
         headers: {
@@ -443,11 +542,7 @@
     }
 
     (async function init() {
-      // API key field remains empty - user must enter manually
-      // const savedKey = getApiKey();
-      // if (savedKey) {
-      //   document.getElementById("apiKeyInput").value = savedKey;
-      // }
+      // Initialization complete
     })();
   </script>
 </body>
