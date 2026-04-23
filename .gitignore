@@ -1,23 +1,45 @@
-# Virtual Environment
-venv/
-
-# Python cache
+# Python bytecode / cache
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
 
-# Environment variables
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Environment / secrets
 .env
+.env.*
+!.env.example
+
+# Flask / app runtime artifacts
+instance/
+*.pid
 
 # Logs
 *.log
+logs/
+
+# Test / coverage / type-check caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# IDE / editor
+.vscode/
+.idea/
 
 # OS files
 .DS_Store
 Thumbs.db
-
-# VS Code settings (optional)
-.vscode/
-
-# ML / large files (if any)
-*.pkl
-*.csv

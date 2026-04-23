@@ -1,129 +1,180 @@
-# 🪄 Background Remover App
+# Production SOP - Background Remover SaaS
 
-A simple yet powerful web app for AI-powered image background removal with a modern, responsive UI.
+This document is an operations runbook for production deployment and maintenance.
+No credentials are included in this file by design.
 
-## ✨ Features
-- Clean, modern interface that fits on one screen
-- Enter API key directly in the app (no pre-configuration needed)
-- Image preview - see your image immediately after selection
-- AI-powered background removal (rembg U²-Net)
-- One-click processing with instant result display
-- Download processed images as PNG with transparent background
-- Fully responsive design - works on all devices
-- No scrolling required - everything visible at once
+---
 
-## 📂 Project Structure
-```
-bg/
-├── run.py                  # Flask server entry point
-├── app.html               # Main web interface (single page)
-├── requirements.txt       # Python dependencies
-├── Dockerfile            # Docker configuration
-├── README.md             # This file
-└── app/
-    ├── __init__.py       # Flask app initialization
-    ├── auth.py           # API key validation
-    ├── routes.py         # API endpoints
-    └── services/
-        └── bg_remove.py  # Background removal logic
-```
+## 1) Scope
 
-## 🚀 Quick Start
+- Deploy and run the Flask + MongoDB SaaS application.
+- Operate user/admin access safely.
+- Troubleshoot common incidents.
+- Avoid insecure practices in production.
 
-### Local Setup
-1. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+---
 
-2. **Set your API key (in .env file):**
-   ```
-   API_KEYS=your-api-key-here
-   ```
+## 2) Required Environment Variables
 
-3. **Run the app:**
-   ```bash
-   python run.py
-   ```
+Set these before starting the app:
 
-4. **Open in browser:**
-   - Visit: `http://localhost:5000/`
+- `SECRET_KEY` (strong random value, required)
+- `MONGO_URI` (required)
+- `MONGO_DB_NAME` (recommended; default `bg_saas`)
 
-### Docker Setup
-```bash
-docker build -t bg-remover .
-docker run -p 5000:5000 bg-remover
+Operational controls:
+
+- `SESSION_COOKIE_SECURE` (set `true` in production)
+- `DAILY_USAGE_LIMIT`
+- `FAILED_ATTEMPTS_THRESHOLD`
+- `RATE_LIMIT_PER_MINUTE`
+
+Optional admin bootstrap:
+
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD`
+
+---
+
+## 3) Deployment SOP (Terminal)
+
+From project root:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python run.py
 ```
 
-Then open `http://localhost:5000/`
+Health checks:
 
-## 💡 How to Use
+- Open `/login` and confirm page loads.
+- Authenticate with an authorized account.
+- Access `/admin` using an admin-role account.
+- Upload one test image in `/app` and verify output.
 
-1. **Load the app** - Open http://localhost:5000/ (no API key required yet)
-2. **Enter API Key** - Paste your API key in the input field and click "Save API Key"
-3. **Select Image** - Click the file input to choose an image (JPG/PNG)
-4. **Preview** - Selected image displays instantly in the preview box
-5. **Remove Background** - Click the "Remove Background" button to process
-6. **Download** - Once processed, click "Download" to save the transparent PNG
+---
 
-## 📋 Requirements
-- Python 3.8+
-- Flask 3.0
-- rembg 2.0 (AI model downloads ~170MB on first run)
-- python-dotenv 1.0
+## 4) Runtime SOP
 
-See `requirements.txt` for full dependencies.
+### 4.1 Daily startup
 
-## ⚙️ Configuration
+1. Ensure database connectivity is available.
+2. Start application process.
+3. Verify authentication route (`/login`) is reachable.
+4. Verify admin dashboard (`/admin`) for admin users.
+5. Perform one end-to-end background removal request.
 
-### API Keys
-Set API keys in `.env` file:
-```
-API_KEYS=key1,key2,key3
-```
+### 4.2 User onboarding
 
-### Environment Variables
-- `API_KEYS` - Comma-separated valid API keys
+1. User signs up through `/signup` (or provisioned by admin process).
+2. Verify user appears in admin dashboard.
+3. Confirm status is active and usage counters initialize correctly.
 
-## 🔧 API Endpoints
+### 4.3 Block / unblock operations
 
-### POST `/api/v1/remove-bg`
-Removes background from uploaded image.
+1. Open `/admin`.
+2. Locate user record.
+3. Apply `Block` or `Unblock`.
+4. Re-verify login/API access behavior.
 
-**Headers:**
-- `x-api-key`: Your API key
+### 4.4 Incident response
 
-**Body:**
-- `image`: Image file (multipart form data)
+1. Inspect app logs/terminal output.
+2. Verify `MONGO_URI` connectivity and network allowlist.
+3. Validate user account status and remaining usage.
+4. Check API rate-limit and threshold configuration.
+5. Retry with valid image input and authenticated session.
 
-**Response:**
-- PNG image with transparent background
+---
 
-## 🎨 UI Features
-- **Gradient background** - Modern purple gradient design
-- **Responsive layout** - Adapts to all screen sizes
-- **Image scaling** - Images maintain aspect ratio in preview boxes
-- **Status updates** - Real-time feedback on API key and processing status
-- **Download button** - Easy download of processed images
+## 5) API Operations SOP
 
-## ⚠️ Important Notes
-- First run downloads the AI model (~170MB) - this may take a few minutes
-- The app requires a valid API key to process images
-- API key is stored locally in your browser
-- Images are processed immediately without caching
+Endpoint:
 
-## 📦 Deployment
+- `POST /api/v1/remove-bg`
 
-The app is Docker-ready. Use the provided `Dockerfile` for containerization and deployment to any hosting platform (AWS, Heroku, Railway, etc.).
+Request:
 
-## 🎯 Perfect For
-- Web developers wanting to add AI image processing
-- Learning about full-stack web applications
-- Integrating background removal into workflows
-- Understanding API authentication and file uploads
+- `multipart/form-data`
+- image field: `image`
 
-## 💬 Notes
-- No database required - stateless API
-- CPU-only processing (can be changed to GPU)
-- API key validation on each request ensures security
-- Clean, maintainable codebase for easy customization
+Auth:
+
+- Session user (browser flow), or API key header (`x-api-key`) for API clients.
+
+Response:
+
+- PNG output stream
+- Usage headers:
+  - `X-Usage-Used`
+  - `X-Usage-Limit`
+  - `X-Remaining-Usage`
+
+Expected errors:
+
+- `400` bad request / missing file
+- `401` unauthenticated / invalid key
+- `403` blocked account
+- `429` limit exceeded
+- `500` processing failure
+
+---
+
+## 6) Security SOP
+
+Do this:
+
+- Store all secrets in environment variables or secret manager.
+- Enforce HTTPS in front of the app.
+- Keep `SESSION_COOKIE_SECURE=true` in production.
+- Rotate credentials and keys periodically.
+- Restrict DB user permissions to least privilege.
+
+Do NOT do this:
+
+- Do not commit credentials, usernames, passwords, or connection strings to git.
+- Do not hardcode secrets in code, templates, scripts, or docs.
+- Do not disable auth/admin decorators.
+- Do not grant admin role without explicit authorization.
+- Do not bypass usage and rate-limit safeguards.
+
+---
+
+## 7) Production Readiness Checklist
+
+- [ ] `SECRET_KEY` set and non-default
+- [ ] `MONGO_URI` set via environment
+- [ ] DB network/IP allowlist configured
+- [ ] HTTPS enabled at ingress/reverse proxy
+- [ ] `SESSION_COOKIE_SECURE=true`
+- [ ] Admin bootstrap credentials not stored in repo
+- [ ] Smoke test passed (`/login`, `/admin`, `/api/v1/remove-bg`)
+- [ ] Operational owner assigned for monitoring and incident response
+
+---
+
+## 8) Troubleshooting Quick Guide
+
+- App fails at startup with config error:
+  - Required env vars are missing (`SECRET_KEY`, `MONGO_URI`).
+- Login works but admin panel denied:
+  - Logged-in user is not admin role.
+- API returns `429`:
+  - User hit daily limit or per-minute rate limit.
+- API returns `500`:
+  - Check image validity, model/runtime dependencies, and logs.
+
+---
+
+## 9) Change Control SOP
+
+Before release:
+
+1. Run dependency install in clean environment.
+2. Run syntax/lint checks.
+3. Validate critical routes and one full upload flow.
+4. Review config changes for secret exposure.
+5. Approve and deploy through standard release process.

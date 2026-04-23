@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Background Remover SaaS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <div>
+        <h2>Background Remover</h2>
+        <div class="meta">Welcome, <strong>{{ user.username }}</strong></div>
+        <div class="meta">API key: <code>{{ user.api_key }}</code></div>
+      </div>
+      <div class="actions">
+        {% if user.role == 'admin' %}
+          <a class="btn-secondary" href="{{ url_for('admin.admin_dashboard') }}">Admin</a>
+        {% endif %}
+        <a class="btn-secondary" href="{{ url_for('auth.logout') }}">Logout</a>
+      </div>
+    </header>
+
+    <section class="usage">
+      <span>Today: <strong id="todayUsage">{{ user.today_usage }}</strong></span>
+      <span>Total: <strong id="totalUsage">{{ user.total_usage }}</strong></span>
+      <span>Remaining: <strong id="remainingUsage">{{ user.remaining_usage }}</strong></span>
+    </section>
+
+    <section class="boxes">
+      <div class="box">
+        <h3>Upload</h3>
+        <input type="file" id="fileInput" accept="image/*">
+        <button id="processBtn">Remove Background</button>
+        <img id="uploadPreview" alt="Upload preview">
+      </div>
+      <div class="box">
+        <h3>Result</h3>
+        <img id="result" alt="Result image">
+        <a id="download" class="btn-secondary" download="output.png">Download</a>
+      </div>
+    </section>
+
+    <p id="status" class="status"></p>
+  </div>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
