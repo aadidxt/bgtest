@@ -6,7 +6,8 @@ from flask_pymongo import PyMongo
 
 from config import Config
 
-mongo = PyMongo()
+import certifi
+mongo = PyMongo(tlsCAFile=certifi.where(), tlsAllowInvalidCertificates=True)
 
 
 def get_db():
