@@ -13,8 +13,10 @@ _rate_lock = Lock()
 
 
 def _resolve_user():
+    print("SESSION:", dict(session))
     username = session.get("username")
     if username:
+        print("USERNAME:", username)
         return get_user_by_username(username)
 
     api_key = request.headers.get("x-api-key", "").strip()

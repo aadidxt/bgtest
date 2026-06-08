@@ -12,7 +12,7 @@ class Config:
     MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "bg_saas")
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
-    SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "true").lower() == "true"
+    SESSION_COOKIE_SECURE = False
     PERMANENT_SESSION_LIFETIME = timedelta(days=1)
     USER_DAILY_USAGE_LIMIT = int(os.getenv("USER_DAILY_USAGE_LIMIT", os.getenv("DAILY_USAGE_LIMIT", "20")))
     ADMIN_DAILY_USAGE_LIMIT = int(os.getenv("ADMIN_DAILY_USAGE_LIMIT", "50"))

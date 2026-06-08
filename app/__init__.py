@@ -22,6 +22,9 @@ def create_app():
         static_url_path="/static",
     )
     app.config.from_object(Config)
+    print("SECURE COOKIE:", app.config["SESSION_COOKIE_SECURE"])
+    print("TYPE:", type(app.config["SESSION_COOKIE_SECURE"]))
+    print("REPR:", repr(app.config["SESSION_COOKIE_SECURE"]))
     if not app.config.get("SECRET_KEY"):
         raise RuntimeError("SECRET_KEY is required.")
     if not app.config.get("MONGO_URI"):
