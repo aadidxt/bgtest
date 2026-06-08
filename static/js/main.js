@@ -23,7 +23,18 @@ processBtn?.addEventListener("click", async () => {
     return;
   }
 
-  statusEl.innerText = "Processing...";
+  // statusEl.innerText = "Processing...";
+
+  const startTime = Date.now();
+
+  statusEl.innerText = "Processing... 0.0s";
+
+  const timer = setInterval(() => {
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    statusEl.innerText = `Processing... ${elapsed}s`;
+  }, 100);
+
+
   const formData = new FormData();
   formData.append("image", fileInput.files[0]);
 
@@ -52,8 +63,13 @@ processBtn?.addEventListener("click", async () => {
       response.headers.get("X-Remaining-Usage") || remainingUsageEl.innerText;
     totalUsageEl.innerText = String(Number(totalUsageEl.innerText || "0") + 1);
 
-    statusEl.innerText = "Done";
+    // statusEl.innerText = "Done";
+    clearInterval(timer);
+
+    const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
+    statusEl.innerText = `✅ Done in ${totalTime} seconds`;
   } catch (err) {
-    statusEl.innerText = "Network or server error.";
+    clearInterval(timer);
+    statusEl.innerText = "❌ Network or server error.";
   }
 });

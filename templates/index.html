@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Background Remover SaaS</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
   <div class="container">
     <header class="topbar">
@@ -16,7 +18,7 @@
       </div>
       <div class="actions">
         {% if user.role == 'admin' %}
-          <a class="btn-secondary" href="{{ url_for('admin.admin_dashboard') }}">Admin</a>
+        <a class="btn-secondary" href="{{ url_for('admin.admin_dashboard') }}">Admin</a>
         {% endif %}
         <a class="btn-secondary" href="{{ url_for('auth.logout') }}">Logout</a>
       </div>
@@ -46,4 +48,5 @@
   </div>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+
 </html>
