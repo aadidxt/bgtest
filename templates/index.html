@@ -30,6 +30,15 @@
       <span>Remaining: <strong id="remainingUsage">{{ user.remaining_usage }}</strong></span>
     </section>
 
+    <section class="resolution-toggle">
+      <span class="toggle-label">Standard</span>
+      <label class="switch">
+        <input type="checkbox" id="resolutionToggle" checked>
+        <span class="slider"></span>
+      </label>
+      <span class="toggle-label">HD</span>
+    </section>
+
     <section class="boxes">
       <div class="box">
         <h3>Upload</h3>
@@ -45,6 +54,36 @@
     </section>
 
     <p id="status" class="status"></p>
+
+    <hr class="section-divider">
+
+    <section class="bulk-section">
+      <h3>Bulk Upload</h3>
+      <p class="bulk-info">Upload multiple images at once (JPG, JPEG, PNG, WEBP &mdash; max 20 files, 10MB each).</p>
+
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-zone-content">
+          <span class="drop-icon">&#128228;</span>
+          <p>Drag &amp; drop images here or <strong>click to browse</strong></p>
+        </div>
+        <input type="file" id="bulkFileInput" accept=".jpg,.jpeg,.png,.webp" multiple hidden>
+      </div>
+
+      <div class="bulk-file-list" id="bulkFileList"></div>
+
+      <button id="bulkProcessBtn" class="btn-primary" disabled>Process All</button>
+
+      <div class="bulk-progress" id="bulkProgress" style="display:none;">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p class="progress-text" id="progressText">Initializing...</p>
+      </div>
+
+      <div class="bulk-summary" id="bulkSummary" style="display:none;"></div>
+
+      <a id="bulkDownloadBtn" class="btn-secondary download-zip" style="display:none;">Download ZIP</a>
+    </section>
   </div>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

@@ -47,7 +47,8 @@ def auth_required(api_mode=False, enforce_usage=True):
                 session.clear()
                 return redirect(url_for("auth.login"))
 
-            if enforce_usage:
+            # Admins bypass usage limits
+            if enforce_usage and user.get("role") != "admin":
                 allowed, refreshed_user, error = can_use_feature(user)
                 if not allowed:
                     if api_mode:
@@ -83,6 +84,10 @@ def rate_limit_per_user(func):
         user = getattr(g, "current_user", None)
         if not user:
             return jsonify({"error": "Authentication required"}), 401
+
+        # Admins bypass rate limits
+        if user.get("role") == "admin":
+            return func(*args, **kwargs)
 
         max_calls = current_app.config["RATE_LIMIT_PER_MINUTE"]
         now = datetime.now(timezone.utc).timestamp()

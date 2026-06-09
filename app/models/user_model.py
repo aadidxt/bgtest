@@ -64,6 +64,10 @@ def update_usage(user_id):
     if not user:
         return None
 
+    # Admins are not charged usage
+    if user.get("role") == "admin":
+        return user
+
     daily_limit = get_daily_limit_for_user(user)
     user = reset_daily_usage_if_needed(user, daily_limit)
 

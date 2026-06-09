@@ -4,6 +4,11 @@ import torch.nn.functional as F
 from torchvision import transforms
 from PIL import Image
 
+RESOLUTIONS = {
+    "hd": (1024, 1024),
+    "standard": (512, 512),
+}
+
 
 def preprocess_image(image: Image.Image, size: tuple = (1024, 1024)) -> torch.Tensor:
     """Resize, normalize, and batch an RGB PIL image for BiRefNet."""

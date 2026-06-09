@@ -135,6 +135,38 @@ button,
   margin-bottom: 10px;
 }
 
+.flash-messages {
+  margin: 12px 0;
+}
+
+.flash {
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.flash.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.flash.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-admin {
+  display: inline-block;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -154,6 +186,62 @@ td {
   border-radius: 10px;
 }
 
+.resolution-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+  justify-content: center;
+}
+
+.toggle-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #9ca3af;
+  border-radius: 26px;
+  transition: 0.3s;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.switch input:checked + .slider {
+  background: #2563eb;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(22px);
+}
+
 input[type="file"] {
   width: 100%;
   margin-bottom: 10px;
@@ -162,6 +250,173 @@ input[type="file"] {
 #download {
   display: none;
   margin-top: 10px;
+}
+
+/* ── Bulk Upload Section ── */
+
+.section-divider {
+  border: none;
+  border-top: 2px solid #e2e8f0;
+  margin: 32px 0 24px;
+}
+
+.bulk-section h3 {
+  margin: 0 0 4px;
+}
+
+.bulk-info {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0 0 16px;
+}
+
+.drop-zone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  background: #f8fafc;
+}
+
+.drop-zone.drag-over {
+  background: #eef2ff;
+  border-color: #2563eb;
+}
+
+.drop-zone-content {
+  pointer-events: none;
+}
+
+.drop-icon {
+  font-size: 40px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.drop-zone p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.drop-zone strong {
+  color: #2563eb;
+}
+
+.bulk-file-list {
+  margin: 12px 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.bulk-file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+.bulk-file-item .file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.bulk-file-item .file-size {
+  color: #9ca3af;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.file-remove {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.file-remove:hover {
+  color: #b91c1c;
+}
+
+.btn-primary {
+  border: none;
+  border-radius: 8px;
+  padding: 9px 13px;
+  cursor: pointer;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.download-zip {
+  margin-top: 12px;
+}
+
+.bulk-progress {
+  margin-top: 14px;
+}
+
+.progress-track {
+  width: 100%;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #2563eb;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.bulk-summary {
+  margin-top: 12px;
+}
+
+.summary-line {
+  margin: 2px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.summary-line.success {
+  color: #16a34a;
+}
+
+.summary-line.fail {
+  color: #dc2626;
+}
+
+.summary-line.total-time {
+  color: #6b7280;
+  font-size: 13px;
+  margin-top: 4px;
 }
 
 @media (max-width: 768px) {
