@@ -36,57 +36,37 @@ def _load_model():
     return _birefnet_model, _device
 
 
-# def remove_background_birefnet(image_bytes: bytes) -> bytes:
-#     """Remove background from raw image bytes and return a PNG with transparency."""
-#     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-#     model, device = _load_model()
-
-#     input_tensor = preprocess_image(image).to(device)
-
-#     with torch.no_grad():
-#         outputs = model(input_tensor)
-
-#     # BiRefNet returns a list of multi-scale predictions; take the first (finest)
-#     preds = outputs[0] if isinstance(outputs, (list, tuple)) else outputs
-#     preds = preds[0]   if isinstance(preds,   (list, tuple)) else preds
-#     preds = torch.sigmoid(preds).cpu().float()
-
-#     result = postprocess_image(image, preds)
-
-#     buf = io.BytesIO()
-#     result.save(buf, format="PNG")
-#     return buf.getvalue()
 
 def remove_background_birefnet(image_bytes: bytes, resolution: str = "hd") -> bytes:
     try:
-        print("STEP 1")
+        
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
 
-        print("STEP 2")
+        
         model, device = _load_model()
 
-        print("STEP 3")
+        
         from app.services.birefnet_utils import RESOLUTIONS
         size = RESOLUTIONS.get(resolution, RESOLUTIONS["hd"])
         input_tensor = preprocess_image(image, size=size).to(device)
 
-        print("STEP 4")
+        
         with torch.no_grad():
             outputs = model(input_tensor)
 
-        print("STEP 5")
+       
         preds = outputs[0] if isinstance(outputs, (list, tuple)) else outputs
         preds = preds[0] if isinstance(preds, (list, tuple)) else preds
         preds = torch.sigmoid(preds).cpu().float()
 
-        print("STEP 6")
+       
         result = postprocess_image(image, preds)
 
-        print("STEP 7")
+       
         buf = io.BytesIO()
         result.save(buf, format="PNG")
 
-        print("STEP 8")
+       
         return buf.getvalue()
 
     except Exception as e:

@@ -7,14 +7,65 @@ const statusEl = document.getElementById("status");
 const todayUsageEl = document.getElementById("todayUsage");
 const totalUsageEl = document.getElementById("totalUsage");
 const remainingUsageEl = document.getElementById("remainingUsage");
+const singleDropZone = document.getElementById("singleDropZone");
+
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_FILES = 20;
+
+// Drag and drop for single file upload
+singleDropZone?.addEventListener("click", () => fileInput?.click());
+
+singleDropZone?.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  singleDropZone.classList.add("drag-over");
+});
+
+singleDropZone?.addEventListener("dragleave", () => {
+  singleDropZone.classList.remove("drag-over");
+});
+
+singleDropZone?.addEventListener("drop", (e) => {
+  e.preventDefault();
+  singleDropZone.classList.remove("drag-over");
+  if (e.dataTransfer.files.length) {
+    const file = e.dataTransfer.files[0];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      alert(`"${file.name}" is not a supported image type.`);
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`"${file.name}" exceeds the 10 MB limit.`);
+      return;
+    }
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    fileInput.files = dt.files;
+    
+    uploadPreview.src = URL.createObjectURL(file);
+    uploadPreview.style.display = "block";
+    statusEl.innerText = ""; // Clear any previous status
+  }
+});
 
 fileInput?.addEventListener("change", () => {
   const file = fileInput.files[0];
   if (!file) {
     return;
   }
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    alert(`"${file.name}" is not a supported image type.`);
+    fileInput.value = "";
+    return;
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    alert(`"${file.name}" exceeds the 10 MB limit.`);
+    fileInput.value = "";
+    return;
+  }
   uploadPreview.src = URL.createObjectURL(file);
   uploadPreview.style.display = "block";
+  statusEl.innerText = ""; // Clear any previous status
 });
 
 processBtn?.addEventListener("click", async () => {
@@ -90,9 +141,7 @@ const progressText = document.getElementById("progressText");
 const bulkSummary = document.getElementById("bulkSummary");
 const bulkDownloadBtn = document.getElementById("bulkDownloadBtn");
 
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const MAX_FILES = 20;
+
 
 let selectedFiles = [];
 let batchId = null;

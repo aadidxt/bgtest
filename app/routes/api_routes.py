@@ -44,7 +44,6 @@ def remove_bg():
     try:
         output = remove_background(file.read(), resolution=resolution)
     except Exception as exc:
-        # return jsonify({"error": f"Background removal failed: {exc}"}), 500
         import traceback
         traceback.print_exc()
         print("ERROR:", repr(exc))

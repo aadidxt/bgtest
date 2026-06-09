@@ -40,14 +40,14 @@
         <tbody>
           {% for user in users %}
             <tr>
-              <td>{{ user.username }}</td>
-              <td>{{ user.role }}</td>
-              <td><code>{{ user.api_key }}</code></td>
-              <td>{{ user.today_usage if user.role != "admin" else "—" }}</td>
-              <td>{{ user.total_usage if user.role != "admin" else "—" }}</td>
-              <td>{{ "Unlimited" if user.role == "admin" else user.remaining_usage }}</td>
-              <td>{{ "Blocked" if user.is_blocked else "Active" }}</td>
-              <td>
+              <td data-label="Username">{{ user.username }}</td>
+              <td data-label="Role">{{ user.role }}</td>
+              <td data-label="API Key"><code>{{ user.api_key }}</code></td>
+              <td data-label="Today">{{ user.today_usage if user.role != "admin" else "—" }}</td>
+              <td data-label="Total">{{ user.total_usage if user.role != "admin" else "—" }}</td>
+              <td data-label="Remaining">{{ "Unlimited" if user.role == "admin" else user.remaining_usage }}</td>
+              <td data-label="Status">{{ "Blocked" if user.is_blocked else "Active" }}</td>
+              <td data-label="Action">
                 {% if user.role != "admin" %}
                 <form method="POST" action="{{ url_for('admin.toggle_block', username=user.username) }}">
                   <button type="submit">{{ "Unblock" if user.is_blocked else "Block" }}</button>

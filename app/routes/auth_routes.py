@@ -46,7 +46,6 @@ def login():
             return render_template("login.html")
 
         session["username"] = user["username"]
-        print("AFTER LOGIN SESSION:", dict(session))
         clear_failed_attempts(user["_id"])
         return redirect(url_for("main.index"))
 

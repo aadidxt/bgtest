@@ -42,8 +42,15 @@
     <section class="boxes">
       <div class="box">
         <h3>Upload</h3>
-        <input type="file" id="fileInput" accept="image/*">
-        <button id="processBtn">Remove Background</button>
+        <div class="drop-zone" id="singleDropZone">
+          <div class="drop-zone-content">
+            <span class="drop-icon">&#128228;</span>
+            <p>Drag &amp; drop an image here or <strong>click to browse</strong></p>
+            <p style="font-size: 12px; margin-top: 6px; color: #6b7280;">Supported formats: JPG, JPEG, PNG, WEBP (Max 10MB)</p>
+          </div>
+          <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" hidden>
+        </div>
+        <button id="processBtn" style="margin-top: 12px;">Remove Background</button>
         <img id="uploadPreview" alt="Upload preview">
       </div>
       <div class="box">
