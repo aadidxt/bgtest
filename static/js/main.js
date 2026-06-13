@@ -4,9 +4,6 @@ const uploadPreview = document.getElementById("uploadPreview");
 const result = document.getElementById("result");
 const download = document.getElementById("download");
 const statusEl = document.getElementById("status");
-const todayUsageEl = document.getElementById("todayUsage");
-const totalUsageEl = document.getElementById("totalUsage");
-const remainingUsageEl = document.getElementById("remainingUsage");
 const singleDropZone = document.getElementById("singleDropZone");
 const pipelineStages = document.getElementById("pipelineStages");
 const originalPlaceholder = document.getElementById("originalPlaceholder");
@@ -290,13 +287,6 @@ processBtn?.addEventListener("click", async () => {
         processedInfo.textContent = `${img.naturalWidth} x ${img.naturalHeight}`;
       };
       img.src = url;
-    }
-
-    if (todayUsageEl) {
-      todayUsageEl.innerText = response.headers.get("X-Usage-Used") || todayUsageEl.innerText;
-      remainingUsageEl.innerText =
-        response.headers.get("X-Remaining-Usage") || remainingUsageEl.innerText;
-      totalUsageEl.innerText = String(Number(totalUsageEl.innerText || "0") + 1);
     }
 
     clearInterval(timer);

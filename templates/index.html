@@ -13,14 +13,6 @@
     <header class="topbar">
       <div>
         <h2>Background Remover</h2>
-        <div class="meta">Welcome, <strong>{{ user.username }}</strong></div>
-        <div class="meta">API key: <code>{{ user.api_key }}</code></div>
-      </div>
-      <div class="actions">
-        {% if user.role == 'admin' %}
-        <a class="btn-secondary" href="{{ url_for('admin.admin_dashboard') }}">Admin</a>
-        {% endif %}
-        <a class="btn-secondary" href="{{ url_for('auth.logout') }}">Logout</a>
       </div>
     </header>
 
@@ -78,14 +70,6 @@
     <div class="pipeline-stages" id="pipelineStages" style="display:none;"></div>
 
     <p id="status" class="status"></p>
-
-    {% if user.role != 'admin' %}
-    <section class="usage">
-      <span>Today: <strong id="todayUsage">{{ user.today_usage }}</strong></span>
-      <span>Total: <strong id="totalUsage">{{ user.total_usage }}</strong></span>
-      <span>Remaining: <strong id="remainingUsage">{{ user.remaining_usage }}</strong></span>
-    </section>
-    {% endif %}
 
     <hr class="section-divider">
 
