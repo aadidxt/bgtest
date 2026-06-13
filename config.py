@@ -18,3 +18,18 @@ class Config:
     ADMIN_DAILY_USAGE_LIMIT = int(os.getenv("ADMIN_DAILY_USAGE_LIMIT", "50"))
     FAILED_ATTEMPTS_THRESHOLD = int(os.getenv("FAILED_ATTEMPTS_THRESHOLD", "5"))
     RATE_LIMIT_PER_MINUTE = int(os.getenv("RATE_LIMIT_PER_MINUTE", "30"))
+
+    # Image Tiling
+    TILE_SIZE = int(os.getenv("TILE_SIZE", "1024"))
+    TILE_OVERLAP = int(os.getenv("TILE_OVERLAP", "64"))
+
+    # OCR
+    OCR_ENABLED = os.getenv("OCR_ENABLED", "true")
+    OCR_CONFIDENCE_THRESHOLD = float(os.getenv("OCR_CONFIDENCE_THRESHOLD", "0.5"))
+
+    # Mask Fusion
+    MASK_FUSION_STRATEGY = os.getenv("MASK_FUSION_STRATEGY", "or")
+
+    # Performance
+    PARALLEL_TILE_PROCESSING = os.getenv("PARALLEL_TILE_PROCESSING", "false")
+    MAX_IMAGE_RESOLUTION = int(os.getenv("MAX_IMAGE_RESOLUTION", "4096"))

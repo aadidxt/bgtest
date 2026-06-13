@@ -8,12 +8,182 @@ const todayUsageEl = document.getElementById("todayUsage");
 const totalUsageEl = document.getElementById("totalUsage");
 const remainingUsageEl = document.getElementById("remainingUsage");
 const singleDropZone = document.getElementById("singleDropZone");
+const pipelineStages = document.getElementById("pipelineStages");
+const originalPlaceholder = document.getElementById("originalPlaceholder");
+const processedPlaceholder = document.getElementById("processedPlaceholder");
+const originalInfo = document.getElementById("originalInfo");
+const processedInfo = document.getElementById("processedInfo");
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const MAX_FILES = 20;
 
-// Drag and drop for single file upload
+/* ───────── Processing Mode ───────── */
+
+let currentMode = "object_detection";
+
+const STAGES = {
+  object_detection: [
+    { id: "upload", label: "Uploading" },
+    { id: "detection", label: "Removing Background" },
+    { id: "rendering", label: "Generating PNG" },
+  ],
+  text_graphic: [
+    { id: "upload", label: "Uploading" },
+    { id: "tiling", label: "Generating Tiles" },
+    { id: "detection", label: "Detecting Text" },
+    { id: "graphics", label: "Detecting Graphics" },
+    { id: "merging", label: "Merging Masks" },
+    { id: "refining", label: "Refining Edges" },
+    { id: "rendering", label: "Generating PNG" },
+  ],
+};
+
+function getCurrentStages() {
+  return STAGES[currentMode] || STAGES.object_detection;
+}
+
+document.querySelectorAll(".segmented-option").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".segmented-option").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentMode = btn.dataset.mode;
+    resetPipeline();
+  });
+});
+
+/* ───────── Pipeline Stage UI ───────── */
+
+function buildStages() {
+  if (!pipelineStages) return;
+  pipelineStages.innerHTML = "";
+  const stages = getCurrentStages();
+  stages.forEach((s) => {
+    const div = document.createElement("div");
+    div.className = "stage";
+    div.dataset.stageId = s.id;
+    div.innerHTML =
+      `<span class="stage-icon">&#9654;</span>` +
+      `<span class="stage-label">${s.label}</span>` +
+      `<span class="stage-status"></span>`;
+    pipelineStages.appendChild(div);
+  });
+}
+
+function resetPipeline() {
+  if (!pipelineStages) return;
+  pipelineStages.style.display = "none";
+  pipelineStages.querySelectorAll(".stage").forEach((el) => {
+    el.classList.remove("active", "done");
+    const icon = el.querySelector(".stage-icon");
+    if (icon) icon.textContent = "\u25B6";
+    const st = el.querySelector(".stage-status");
+    if (st) st.textContent = "";
+  });
+  statusEl.innerText = "";
+}
+
+function showStage(stageId) {
+  if (!pipelineStages) return;
+  pipelineStages.style.display = "flex";
+  const stages = getCurrentStages();
+  let activeFound = false;
+  stages.forEach((s) => {
+    const el = pipelineStages.querySelector(`[data-stage-id="${s.id}"]`);
+    if (!el) return;
+    if (s.id === stageId) {
+      el.classList.add("active");
+      el.classList.remove("done");
+      el.querySelector(".stage-icon").textContent = "\u25B6";
+      el.querySelector(".stage-status").textContent = "In progress\u2026";
+      activeFound = true;
+    } else if (!activeFound) {
+      el.classList.remove("active");
+      el.classList.add("done");
+      el.querySelector(".stage-icon").textContent = "\u2713";
+      el.querySelector(".stage-status").textContent = "Done";
+    } else {
+      el.classList.remove("active", "done");
+      el.querySelector(".stage-icon").textContent = "\u25B6";
+      el.querySelector(".stage-status").textContent = "";
+    }
+  });
+}
+
+function finishStages() {
+  if (!pipelineStages) return;
+  pipelineStages.querySelectorAll(".stage").forEach((el) => {
+    el.classList.remove("active");
+    el.classList.add("done");
+    el.querySelector(".stage-icon").textContent = "\u2713";
+    el.querySelector(".stage-status").textContent = "Done";
+  });
+}
+
+/* ───────── Stage Simulation ───────── */
+
+let stageTimer = null;
+let stageIndex = 0;
+
+function startStageSimulation() {
+  resetPipeline();
+  buildStages();
+  stageIndex = 0;
+  const stages = getCurrentStages();
+  if (stages.length > 0) showStage(stages[0].id);
+  const stageDuration = 800;
+
+  if (stageTimer) clearInterval(stageTimer);
+  stageTimer = setInterval(() => {
+    stageIndex++;
+    const stages = getCurrentStages();
+    if (stageIndex < stages.length) {
+      showStage(stages[stageIndex].id);
+    } else {
+      clearInterval(stageTimer);
+      stageTimer = null;
+    }
+  }, stageDuration);
+}
+
+function stopStageSimulation(completed) {
+  if (stageTimer) {
+    clearInterval(stageTimer);
+    stageTimer = null;
+  }
+  if (completed) {
+    finishStages();
+  } else {
+    resetPipeline();
+  }
+}
+
+/* ───────── Single Image Upload ───────── */
+
+function hasImage() {
+  return fileInput?.files?.length > 0;
+}
+
+function updateProcessBtn() {
+  processBtn.disabled = !hasImage();
+}
+
+function showOriginalImage(file) {
+  const url = URL.createObjectURL(file);
+  uploadPreview.src = url;
+  uploadPreview.style.display = "block";
+  if (originalPlaceholder) originalPlaceholder.style.display = "none";
+  if (originalInfo) {
+    const img = new Image();
+    img.onload = () => {
+      originalInfo.textContent = `${img.naturalWidth} x ${img.naturalHeight}`;
+    };
+    img.src = url;
+  }
+  updateProcessBtn();
+  resetPipeline();
+}
+
 singleDropZone?.addEventListener("click", () => fileInput?.click());
 
 singleDropZone?.addEventListener("dragover", (e) => {
@@ -41,50 +211,46 @@ singleDropZone?.addEventListener("drop", (e) => {
     const dt = new DataTransfer();
     dt.items.add(file);
     fileInput.files = dt.files;
-    
-    uploadPreview.src = URL.createObjectURL(file);
-    uploadPreview.style.display = "block";
-    statusEl.innerText = ""; // Clear any previous status
+    showOriginalImage(file);
   }
 });
 
 fileInput?.addEventListener("change", () => {
   const file = fileInput.files[0];
-  if (!file) {
-    return;
-  }
+  if (!file) return;
   if (!ALLOWED_TYPES.includes(file.type)) {
     alert(`"${file.name}" is not a supported image type.`);
     fileInput.value = "";
+    updateProcessBtn();
     return;
   }
   if (file.size > MAX_FILE_SIZE) {
     alert(`"${file.name}" exceeds the 10 MB limit.`);
     fileInput.value = "";
+    updateProcessBtn();
     return;
   }
-  uploadPreview.src = URL.createObjectURL(file);
-  uploadPreview.style.display = "block";
-  statusEl.innerText = ""; // Clear any previous status
+  showOriginalImage(file);
 });
 
+/* ───────── Process Single Image ───────── */
+
 processBtn?.addEventListener("click", async () => {
-  if (!fileInput.files[0]) {
+  if (!hasImage()) {
     statusEl.innerText = "Please select an image first.";
     return;
   }
 
-  // statusEl.innerText = "Processing...";
-
   const startTime = Date.now();
-
   statusEl.innerText = "Processing... 0.0s";
+  processBtn.disabled = true;
 
   const timer = setInterval(() => {
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
     statusEl.innerText = `Processing... ${elapsed}s`;
   }, 100);
 
+  startStageSimulation();
 
   const resolutionToggle = document.getElementById("resolutionToggle");
   const resolution = resolutionToggle?.checked ? "hd" : "standard";
@@ -92,6 +258,7 @@ processBtn?.addEventListener("click", async () => {
   const formData = new FormData();
   formData.append("image", fileInput.files[0]);
   formData.append("resolution", resolution);
+  formData.append("processing_mode", currentMode);
 
   try {
     const response = await fetch("/api/v1/remove-bg", {
@@ -100,8 +267,11 @@ processBtn?.addEventListener("click", async () => {
     });
 
     if (!response.ok) {
+      clearInterval(timer);
       const data = await response.json().catch(() => ({}));
       statusEl.innerText = data.error || "Request failed.";
+      stopStageSimulation(false);
+      processBtn.disabled = false;
       return;
     }
 
@@ -110,23 +280,36 @@ processBtn?.addEventListener("click", async () => {
 
     result.src = url;
     result.style.display = "block";
+    if (processedPlaceholder) processedPlaceholder.style.display = "none";
     download.href = url;
     download.style.display = "inline-block";
 
-    todayUsageEl.innerText = response.headers.get("X-Usage-Used") || todayUsageEl.innerText;
-    remainingUsageEl.innerText =
-      response.headers.get("X-Remaining-Usage") || remainingUsageEl.innerText;
-    totalUsageEl.innerText = String(Number(totalUsageEl.innerText || "0") + 1);
+    if (processedInfo) {
+      const img = new Image();
+      img.onload = () => {
+        processedInfo.textContent = `${img.naturalWidth} x ${img.naturalHeight}`;
+      };
+      img.src = url;
+    }
 
-    // statusEl.innerText = "Done";
+    if (todayUsageEl) {
+      todayUsageEl.innerText = response.headers.get("X-Usage-Used") || todayUsageEl.innerText;
+      remainingUsageEl.innerText =
+        response.headers.get("X-Remaining-Usage") || remainingUsageEl.innerText;
+      totalUsageEl.innerText = String(Number(totalUsageEl.innerText || "0") + 1);
+    }
+
     clearInterval(timer);
+    stopStageSimulation(true);
 
     const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
-    statusEl.innerText = `✅ Done in ${totalTime} seconds`;
+    statusEl.innerText = `\u2705 Done in ${totalTime} seconds`;
   } catch (err) {
     clearInterval(timer);
+    stopStageSimulation(false);
     statusEl.innerText = "Network or server error.";
   }
+  processBtn.disabled = false;
 });
 
 /* ───────── Bulk Upload ───────── */
@@ -141,15 +324,11 @@ const progressText = document.getElementById("progressText");
 const bulkSummary = document.getElementById("bulkSummary");
 const bulkDownloadBtn = document.getElementById("bulkDownloadBtn");
 
-
-
 let selectedFiles = [];
 let batchId = null;
 let pollTimer = null;
 let bulkTimer = null;
 let bulkStartTime = null;
-
-/* ── Drag / drop / click ── */
 
 dropZone?.addEventListener("click", () => bulkFileInput?.click());
 
@@ -172,8 +351,6 @@ bulkFileInput?.addEventListener("change", () => {
   if (bulkFileInput.files.length) addFiles(bulkFileInput.files);
   bulkFileInput.value = "";
 });
-
-/* ── File validation & list ── */
 
 function addFiles(fileList) {
   const newFiles = [];
@@ -224,8 +401,6 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-/* ── Process All ── */
-
 bulkProcessBtn?.addEventListener("click", async () => {
   if (selectedFiles.length === 0) return;
 
@@ -235,6 +410,7 @@ bulkProcessBtn?.addEventListener("click", async () => {
   const formData = new FormData();
   for (const file of selectedFiles) formData.append("images", file);
   formData.append("resolution", resolution);
+  formData.append("processing_mode", currentMode);
 
   bulkProcessBtn.disabled = true;
   bulkProgress.style.display = "block";
@@ -313,8 +489,6 @@ function finishBulk(status) {
   bulkProcessBtn.disabled = false;
 }
 
-/* ── Download ZIP ── */
-
 bulkDownloadBtn?.addEventListener("click", () => {
   setTimeout(() => {
     selectedFiles = [];
@@ -328,3 +502,12 @@ bulkDownloadBtn?.addEventListener("click", () => {
     progressFill.style.width = "0%";
   }, 2000);
 });
+
+/* ───────── Init ───────── */
+
+buildStages();
+updateProcessBtn();
+
+if (!result.src || result.src === "") {
+  result.style.display = "none";
+}

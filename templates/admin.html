@@ -30,7 +30,6 @@
             <th>Username</th>
             <th>Role</th>
             <th>API Key</th>
-            <th>Today</th>
             <th>Total</th>
             <th>Remaining</th>
             <th>Status</th>
@@ -43,7 +42,6 @@
               <td data-label="Username">{{ user.username }}</td>
               <td data-label="Role">{{ user.role }}</td>
               <td data-label="API Key"><code>{{ user.api_key }}</code></td>
-              <td data-label="Today">{{ user.today_usage if user.role != "admin" else "—" }}</td>
               <td data-label="Total">{{ user.total_usage if user.role != "admin" else "—" }}</td>
               <td data-label="Remaining">{{ "Unlimited" if user.role == "admin" else user.remaining_usage }}</td>
               <td data-label="Status">{{ "Blocked" if user.is_blocked else "Active" }}</td>

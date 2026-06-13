@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-
 from flask import current_app
 from pymongo import ReturnDocument
 

@@ -7,7 +7,7 @@ import uuid
 import zipfile
 from pathlib import Path
 
-from flask import Blueprint, g, jsonify, send_file
+from flask import Blueprint, current_app, g, jsonify, send_file
 
 from app.models.user_model import update_usage
 from app.services.bg_remove import remove_background
@@ -41,8 +41,20 @@ def remove_bg():
     if resolution not in ("hd", "standard"):
         resolution = "hd"
 
+    processing_mode = request.form.get("processing_mode", "object_detection")
+
+    cfg = current_app.config
+    pipeline_kwargs = {
+        "processing_mode": processing_mode,
+        "tile_size": int(request.form.get("tile_size", cfg.get("TILE_SIZE", "1024"))),
+        "overlap": int(request.form.get("overlap", cfg.get("TILE_OVERLAP", "64"))),
+        "enable_ocr": True,
+        "ocr_conf": float(request.form.get("ocr_conf", cfg.get("OCR_CONFIDENCE_THRESHOLD", "0.5"))),
+        "fusion_strategy": request.form.get("fusion_strategy", cfg.get("MASK_FUSION_STRATEGY", "or")),
+    }
+
     try:
-        output = remove_background(file.read(), resolution=resolution)
+        output = remove_background(file.read(), resolution=resolution, **pipeline_kwargs)
     except Exception as exc:
         import traceback
         traceback.print_exc()
@@ -85,13 +97,14 @@ def _process_batch(batch_id):
     resolution = info["resolution"]
     temp_dir = Path(info["temp_dir"])
     is_admin = info.get("is_admin", False)
+    pipeline_kwargs = info.get("pipeline_kwargs", {})
     total = len(files)
     completed = 0
     failed = 0
 
     for filename, data in files:
         try:
-            result_bytes = remove_background(data, resolution=resolution)
+            result_bytes = remove_background(data, resolution=resolution, **pipeline_kwargs)
             stem = Path(filename).stem
             out_name = f"{stem}_processed.png"
             (temp_dir / out_name).write_bytes(result_bytes)
@@ -150,6 +163,18 @@ def remove_bg_bulk():
     if not validated:
         return jsonify({"error": "No valid image files provided."}), 400
 
+    processing_mode = request.form.get("processing_mode", "object_detection")
+
+    cfg = current_app.config
+    pipeline_kwargs = {
+        "processing_mode": processing_mode,
+        "tile_size": int(cfg.get("TILE_SIZE", "1024")),
+        "overlap": int(cfg.get("TILE_OVERLAP", "64")),
+        "enable_ocr": True,
+        "ocr_conf": float(cfg.get("OCR_CONFIDENCE_THRESHOLD", "0.5")),
+        "fusion_strategy": cfg.get("MASK_FUSION_STRATEGY", "or"),
+    }
+
     batch_id = uuid.uuid4().hex
     temp_dir = Path(tempfile.mkdtemp(prefix=f"bulk_{batch_id}_"))
 
@@ -166,6 +191,7 @@ def remove_bg_bulk():
         "failed": 0,
         "pending": len(validated),
         "created_at": time.time(),
+        "pipeline_kwargs": pipeline_kwargs,
     }
 
     with _batch_lock:

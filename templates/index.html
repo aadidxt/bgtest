@@ -24,12 +24,6 @@
       </div>
     </header>
 
-    <section class="usage">
-      <span>Today: <strong id="todayUsage">{{ user.today_usage }}</strong></span>
-      <span>Total: <strong id="totalUsage">{{ user.total_usage }}</strong></span>
-      <span>Remaining: <strong id="remainingUsage">{{ user.remaining_usage }}</strong></span>
-    </section>
-
     <section class="resolution-toggle">
       <span class="toggle-label">Standard</span>
       <label class="switch">
@@ -39,28 +33,59 @@
       <span class="toggle-label">HD</span>
     </section>
 
-    <section class="boxes">
-      <div class="box">
-        <h3>Upload</h3>
-        <div class="drop-zone" id="singleDropZone">
-          <div class="drop-zone-content">
-            <span class="drop-icon">&#128228;</span>
-            <p>Drag &amp; drop an image here or <strong>click to browse</strong></p>
-            <p style="font-size: 12px; margin-top: 6px; color: #6b7280;">Supported formats: JPG, JPEG, PNG, WEBP (Max 10MB)</p>
-          </div>
-          <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" hidden>
-        </div>
-        <button id="processBtn" style="margin-top: 12px;">Remove Background</button>
-        <img id="uploadPreview" alt="Upload preview">
-      </div>
-      <div class="box">
-        <h3>Result</h3>
-        <img id="result" alt="Result image">
-        <a id="download" class="btn-secondary" download="output.png">Download</a>
+    <section class="mode-selector">
+      <span class="mode-label">Processing Mode</span>
+      <div class="segmented-control" id="modeSelector">
+        <button class="segmented-option active" data-mode="object_detection">Object Detection</button>
+        <button class="segmented-option" data-mode="text_graphic">Text / Graphic Detection</button>
       </div>
     </section>
 
+    <div class="comparison">
+      <div class="preview-card" id="originalCard">
+        <div class="preview-header">
+          <span class="preview-title">Original Image</span>
+          <span class="preview-info" id="originalInfo"></span>
+        </div>
+        <div class="preview-body" id="singleDropZone">
+          <img id="uploadPreview" alt="Original image" style="display:none">
+          <div class="preview-placeholder" id="originalPlaceholder">
+            <span class="drop-icon">&#128228;</span>
+            <p>Drop an image here or <strong>click to browse</strong></p>
+            <p class="hint">JPG, JPEG, PNG, WEBP (Max 10MB)</p>
+          </div>
+        </div>
+        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" hidden>
+      </div>
+      <div class="preview-card" id="processedCard">
+        <div class="preview-header">
+          <span class="preview-title">Processed Result</span>
+          <span class="preview-info" id="processedInfo"></span>
+        </div>
+        <div class="preview-body checkerboard-bg">
+          <img id="result" alt="Processed image" style="display:none">
+          <div class="preview-placeholder" id="processedPlaceholder">
+            <span class="drop-icon">&#10024;</span>
+            <p>Your result will appear here</p>
+          </div>
+        </div>
+        <a id="download" class="btn-secondary" download="output.png" style="display:none">Download</a>
+      </div>
+    </div>
+
+    <button id="processBtn" class="btn-primary process-btn" disabled>Remove Background</button>
+
+    <div class="pipeline-stages" id="pipelineStages" style="display:none;"></div>
+
     <p id="status" class="status"></p>
+
+    {% if user.role != 'admin' %}
+    <section class="usage">
+      <span>Today: <strong id="todayUsage">{{ user.today_usage }}</strong></span>
+      <span>Total: <strong id="totalUsage">{{ user.total_usage }}</strong></span>
+      <span>Remaining: <strong id="remainingUsage">{{ user.remaining_usage }}</strong></span>
+    </section>
+    {% endif %}
 
     <hr class="section-divider">
 

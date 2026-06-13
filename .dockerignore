@@ -16,9 +16,9 @@ env/
 .idea/
 
 # Environment / secrets
-.env
-.env.*
-!.env.example
+# .env
+# .env.*
+# !.env.example
 
 # Runtime / logs
 *.log
@@ -41,5 +41,16 @@ dist/
 .eggs/
 pip-wheel-metadata/
 
-# Docs / local notes (optional in image context)
+# Docs / local notes
 README.md
+DOCUMENTATION.md
+dependency_report.md
+
+# IDE / editor files
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db

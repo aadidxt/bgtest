@@ -6,7 +6,7 @@
 Web application that removes backgrounds from images using the [BiRefNet](https://huggingface.co/ZhengPeng7/BiRefNet) deep-learning model. Supports single-image processing and asynchronous bulk processing with real-time progress tracking.
 
 **Base URL**  
-`http://localhost:5000`  
+`http://localhost:5001`  
 API endpoints are prefixed with `/api/v1`.
 
 **Authentication Methods**
@@ -83,7 +83,7 @@ Register a new user account.
 **Example Request**
 
 ```bash
-curl -X POST http://localhost:5000/signup \
+curl -X POST http://localhost:5001/signup \
   -d "username=johndoe" \
   -d "password=secret123"
 ```
@@ -131,7 +131,7 @@ Authenticate an existing user.
 **Example Request**
 
 ```bash
-curl -X POST http://localhost:5000/login \
+curl -X POST http://localhost:5001/login \
   -d "username=johndoe" \
   -d "password=secret123"
 ```
@@ -227,7 +227,7 @@ Remove the background from a single image.
 **Example Request**
 
 ```bash
-curl -X POST http://localhost:5000/api/v1/remove-bg \
+curl -X POST http://localhost:5001/api/v1/remove-bg \
   -H "X-API-Key: bg_abc123..." \
   -F "image=@photo.jpg" \
   -F "resolution=hd"
@@ -286,7 +286,7 @@ Start an asynchronous bulk background-removal job. All images are uploaded in a 
 **Example Request**
 
 ```bash
-curl -X POST http://localhost:5000/api/v1/remove-bg/bulk \
+curl -X POST http://localhost:5001/api/v1/remove-bg/bulk \
   -H "X-API-Key: bg_abc123..." \
   -F "images=@photo1.jpg" \
   -F "images=@photo2.png" \
@@ -347,7 +347,7 @@ Poll the current progress of a bulk processing job.
 **Example Request**
 
 ```bash
-curl http://localhost:5000/api/v1/remove-bg/bulk/a1b2c3d4e5f6.../status \
+curl http://localhost:5001/api/v1/remove-bg/bulk/a1b2c3d4e5f6.../status \
   -H "X-API-Key: bg_abc123..."
 ```
 
@@ -399,7 +399,7 @@ Download a ZIP archive containing all successfully processed images from a compl
 **Example Request**
 
 ```bash
-curl -OJ http://localhost:5000/api/v1/remove-bg/bulk/a1b2c3d4e5f6.../download \
+curl -OJ http://localhost:5001/api/v1/remove-bg/bulk/a1b2c3d4e5f6.../download \
   -H "X-API-Key: bg_abc123..."
 ```
 
@@ -460,7 +460,7 @@ Render the admin dashboard showing all registered users with their usage stats a
 **Example Request**
 
 ```bash
-curl http://localhost:5000/admin \
+curl http://localhost:5001/admin \
   -b "session=..."
 ```
 
@@ -505,7 +505,7 @@ Block or unblock a non-admin user.
 **Example Request**
 
 ```bash
-curl -X POST http://localhost:5000/admin/toggle-block/johndoe \
+curl -X POST http://localhost:5001/admin/toggle-block/johndoe \
   -b "session=..."
 ```
 

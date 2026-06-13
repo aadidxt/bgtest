@@ -9,9 +9,9 @@ venv/
 env/
 
 # Environment / secrets
-.env
-.env.*
-!.env.example
+# .env
+# .env.*
+# !.env.example
 
 # Flask / app runtime artifacts
 instance/
